@@ -1,4 +1,4 @@
-package zeyracakes.co.tz.controllers;
+package zeyracakes.co.tz.Controllers;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
