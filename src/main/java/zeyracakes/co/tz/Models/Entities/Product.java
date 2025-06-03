@@ -25,6 +25,14 @@ public class Product {
         this.imagePath = imagePath;
     }
 
+    public void updateMetaData(String name, String description, Long price, String imagePath)
+    {
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.imagePath = imagePath;
+    }
+
     public String getName() {
         return name;
     }

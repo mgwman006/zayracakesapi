@@ -2,19 +2,12 @@ package zeyracakes.co.tz.Services;
 
 import com.google.cloud.storage.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import zeyracakes.co.tz.Models.Entities.Product;
 import zeyracakes.co.tz.Models.Requests.AddProductDto;
+import zeyracakes.co.tz.Models.Requests.UpdateProductMetaDataDto;
 import zeyracakes.co.tz.Models.Responses.ProductDetailsDto;
 import zeyracakes.co.tz.Repositories.ProductRepository;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
 
@@ -91,6 +84,37 @@ public class ProductService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    public ProductDetailsDto updateProductMetaData(Long productId, UpdateProductMetaDataDto productMetaDataDto)
+    {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isEmpty())
+            throw new RuntimeException("Product with id "+productId+" not exist");
+
+        Product product = optionalProduct.get();
+        product.updateMetaData(
+                productMetaDataDto.name(),
+                productMetaDataDto.description(),
+                productMetaDataDto.price(),
+                productMetaDataDto.imagePath()
+        );
+
+        try {
+            product =  productRepository.save(product);
+            return new ProductDetailsDto(
+                    product.getId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getPrice(),
+                    product.getImagePath()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update product metadata: " + e.getMessage(), e);
+
+        }
+
 
     }
 }
