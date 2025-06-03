@@ -9,6 +9,7 @@ import zeyracakes.co.tz.Models.Responses.ProductDetailsDto;
 import zeyracakes.co.tz.Services.ProductService;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/product")
@@ -40,5 +41,12 @@ public class ProductController {
 
         URI location = URI.create("landlords/"+addedProduct.id());
         return ResponseEntity.created(location).body(addedProduct);
-    };
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ProductDetailsDto>> getAllProducts()
+    {
+        List<ProductDetailsDto> productList = productService.getAllProducts();
+        return ResponseEntity.ok(productList);
+    }
 }

@@ -15,6 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -44,14 +45,6 @@ public class ProductService {
 
             String publicUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
 
-
-            // Get the object
-//            Blob blob = storage.get(bucketName, objectName);
-//            blob.getMetadata().get("");
-
-
-
-
             Product newProduct = new Product(
                     productDto.name(),
                     productDto.description(),
@@ -73,5 +66,16 @@ public class ProductService {
             throw new RuntimeException(e);
         }
 
+    }
+
+    public List<ProductDetailsDto> getAllProducts()
+    {
+        return productRepository.findAll().stream().map(p -> new ProductDetailsDto(
+                p.getId(),
+                p.getName(),
+                p.getDescription(),
+                p.getPrice(),
+                p.getImagePath()
+        )).toList();
     }
 }

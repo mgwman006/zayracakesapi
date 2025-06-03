@@ -15,6 +15,9 @@ public class Product {
     @Column(unique = true)
     private String imagePath;
 
+    public Product() {
+    }
+
     public Product(String name, String description, Long price, String imagePath) {
         this.name = name;
         this.description = description;
