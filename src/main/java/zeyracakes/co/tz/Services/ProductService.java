@@ -78,4 +78,19 @@ public class ProductService {
                 p.getImagePath()
         )).toList();
     }
+
+    public void deleteProduct(Long productId)
+    {
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isEmpty())
+            throw new RuntimeException("Product with id "+productId+" not exist");
+
+        try
+        {
+            productRepository.delete(optionalProduct.get());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+    }
 }
