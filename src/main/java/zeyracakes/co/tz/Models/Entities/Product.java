@@ -1,6 +1,7 @@
 package zeyracakes.co.tz.Models.Entities;
 
 import jakarta.persistence.*;
+import zeyracakes.co.tz.Models.Entities.Orders.OrderItem;
 
 @Entity
 @Table(name = "products")
@@ -14,6 +15,8 @@ public class Product {
     private Long price;
     @Column(unique = true)
     private String imagePath;
+    @OneToOne(mappedBy = "product", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
+    private OrderItem orderItem;
 
     public Product() {
     }
@@ -69,4 +72,11 @@ public class Product {
         return id;
     }
 
+    public OrderItem getOrderItem() {
+        return orderItem;
+    }
+
+    public void setOrderItem(OrderItem orderItem) {
+        this.orderItem = orderItem;
+    }
 }
