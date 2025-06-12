@@ -3,8 +3,6 @@ package zeyracakes.co.tz.Services;
 import com.google.cloud.storage.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -71,11 +69,7 @@ public class ProductService {
         String bucketName = "zayracakes";
         String objectName = "productimages/"+path.getFileName();
         final String region = "eu-west-2"; // Replace with your region
-        S3Client s3Client = S3Client.builder().region(Region.of(region))
-                .credentialsProvider(
-                        StaticCredentialsProvider
-                        .create(AwsBasicCredentials.create("AKIA6OYBCFZM3YPK7DUF", "QxxqXYTdBgs3R5A4hET00JjPhAf1MERKyBjs+ADB")))
-                .build();
+        S3Client s3Client = S3Client.builder().region(Region.of(region)).build();
 
 
 
