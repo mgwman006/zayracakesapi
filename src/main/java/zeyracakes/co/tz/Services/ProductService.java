@@ -2,12 +2,21 @@ package zeyracakes.co.tz.Services;
 
 import com.google.cloud.storage.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 import zeyracakes.co.tz.Models.Entities.Product;
 import zeyracakes.co.tz.Models.Requests.AddProductDto;
 import zeyracakes.co.tz.Models.Requests.UpdateProductMetaDataDto;
 import zeyracakes.co.tz.Models.Responses.ProductDetailsDto;
 import zeyracakes.co.tz.Repositories.ProductRepository;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,24 +35,17 @@ public class ProductService {
 
         try {
 
-            String projectId = "tante-461318";
-            String bucketName = "zayracakes";
-            String objectName = "productimages/"+productDto.image().getOriginalFilename();
 
-            BlobId blobId = BlobId.of(bucketName, objectName);
-            BlobInfo blobInfo = BlobInfo.newBuilder(blobId).build();
-            Storage storage = StorageOptions.getDefaultInstance().getService();
-            storage.create(blobInfo, productDto.image().getBytes());
-
-
-            String publicUrl = String.format("https://storage.googleapis.com/%s/%s", bucketName, objectName);
-
+            File tempFile = File.createTempFile("upload-", productDto.image().getOriginalFilename());
+            productDto.image().transferTo(tempFile);
+            String key = saveImageToS3(tempFile.toPath());
             Product newProduct = new Product(
                     productDto.name(),
                     productDto.description(),
                     productDto.price(),
-                    publicUrl
+                    key
             );
+
 
             newProduct = productRepository.save(newProduct);
 
@@ -58,6 +60,34 @@ public class ProductService {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+
+    }
+
+    public String saveImageToS3(Path path) throws IOException {
+
+
+        String bucketName = "zayracakes";
+        String objectName = "productimages/"+path.getFileName();
+        final String region = "eu-west-2"; // Replace with your region
+        S3Client s3Client = S3Client.builder().region(Region.of(region)).build();
+
+
+
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+        .bucket(bucketName)
+        .key(objectName)
+        .contentType(Files.probeContentType(path))
+        .build();
+
+
+        try {
+
+            s3Client.putObject(putObjectRequest, path);
+            return "https://" + bucketName + ".s3." + region + ".amazonaws.com/" + objectName;
+
+        } catch (S3Exception e) {
+         throw new RuntimeException("Failed to upload image to S3", e);
+         }
 
     }
 
